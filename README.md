@@ -2,7 +2,7 @@
 
 > **Pré-requisito:** (Java8 e MySQL)
 
-#Backend
+##Backend
 
 Para criar esse projeto, foi utilizado as seguintes tecnologia:
 **Spring-boot**, **MySQL**, **Maven** e **Java 8**
@@ -16,7 +16,7 @@ Para criar esse projeto, foi utilizado as seguintes tecnologia:
     > src/main/java/com/br/platform_godev/PlatformGodevApplication.java
 *   As migrações serão criadas no momento que a aplicação subir.
 
-#Frontend
+##Frontend
 
 Para criar esse projeto foi utilizado as seguintes tecnologias:
 **HTML**, **CSS**, **JS** e **Bootstrap**.
