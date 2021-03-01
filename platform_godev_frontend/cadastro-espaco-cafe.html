@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <title>Plataforma GoDev</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Plataforma GoDev</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="row">
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cadastro-pessoa.html">Cadastrar Pessoa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cadastro-sala.html">Cadastrar Sala</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="cadastro-espaco-cafe.html">Cadastrar Espaço Café</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+<br/>
+<div class="container">
+    <div class="card">
+        <h5 class="card-header">Espaço de Café</h5>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="nome" placeholder="Digite o nome">
+                </div>
+                <div class="col-md-6" style="margin-bottom: 20px">
+                    <label for="lotacao" class="form-label">Lotação</label>
+                    <input type="number" min="1" class="form-control" id="lotacao" placeholder="Digite a lotação">
+                </div>
+                <hr/>
+                <div class="col-md-6">
+                    <button onclick="cadastrar()" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <h4>Consultar Espaço de Café</h4>
+                <hr/>
+                <div class="col-md-4" >
+                    <label for="sobrenome" class="form-label">Filtrar Espaço de Café</label>
+                    <select class="form-select" id="filtro">
+                        <option selected>Qual pessoa deseja consultar?</option>
+                    </select>
+                </div>
+                <div class="col-md-4" style="margin-top: 30px" >
+                    <button onclick="filtrar()" class="btn btn-primary">Filtrar</button>
+                </div>
+                <br>
+                <br>
+                <br>
+                <br>
+                <hr/>
+                <table id="myTable" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">Treinamento</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Sobrenome</th>
+                        <th scope="col">Primeira Etapa</th>
+                        <th scope="col">Segunda Etapa</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="toast-error" class="toast align-items-center text-white bg-danger border-0 " 
+        role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000" 
+        style="position: absolute; top: 4rem; right: 1rem;">
+        <div class="toast-body">
+            E necessário preencher os campos obrigatórios.
+        </div>
+    </div>
+    <div id="toast-success" class="toast align-items-center text-white bg-success border-0 " 
+        role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000" 
+        style="position: absolute; top: 4rem; right: 1rem;">
+        <div class="toast-body">
+            Registro adicionado com sucesso!
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+<script>
+    $.ajax({
+        type:"GET",
+        url: "http://localhost:8080/lista-cafe",
+        success: function(data) {
+            data.forEach(item => {
+                    $("#filtro").append(new Option(item.nome, item.id));
+                })
+        },
+        error: function(data) {
+            console.log(data)
+        }
+    });
+
+    function cadastrar() {
+        const nome = document.getElementById("nome").value;
+        const lotacao = document.getElementById("lotacao").value;
+        if (!nome || !lotacao) {
+            $('#toast-error').toast('show');
+        } else {
+            $.ajax({
+                type:"GET",
+                url: "http://localhost:8080/criar-espaco-cafe?nome="+nome+"&&lotacao="+lotacao,
+                success: function(data) {
+                    $('#toast-success').toast('show');
+                },
+                error: function(data) {
+                    if(data.status === 0)
+                        $('#toast-success').toast('show');
+                }
+            });
+        }
+    }
+
+    function filtrar() {
+        const id = document.getElementById("filtro").value;
+        const lista = [];
+
+        $.ajax({
+            type:"GET",
+            url: "http://localhost:8080/lista-movimentacoes",
+            success: function(data) {
+                $('#myTable tbody').empty();
+                data.forEach(item => {
+                   if (
+                       (item["espacoCafe1Id"] && item["espacoCafe1Id"]["id"] === Number(id)) ||
+                       (item["espacoCafe2Id"] && item["espacoCafe2Id"]["id"] === Number(id))
+                    ) {
+                    $('#myTable > tbody:last-child').append(
+                        '<tr>'
+                            +'<td>'+item["treinamentoId"]["nome"]+'</td>'
+                            +'<td>'+item["pessoaId"]["nome"]+'</td>'
+                            +'<td>'+item["pessoaId"]["sobrenome"]+'</td>'
+                            +'<td>'+item["espacoCafe1Id"]["nome"]+'</td>'
+                            +'<td>'+item["espacoCafe2Id"]["nome"]+'</td>'
+                        +'</tr>');
+                   }
+               })
+               
+            }
+        });
+    }
+</script>
+</body>
+</html>
